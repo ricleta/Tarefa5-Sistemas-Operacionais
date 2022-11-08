@@ -3,7 +3,7 @@
 Tarefa5 = https://replit.com/@ricleta/Tarefa5
 
 ### Enunciado
-[PDF aqui]()
+[PDF aqui](https://github.com/ricleta/Tarefa5-Sistemas-Operacionais/blob/5514a719f315402ebfd0d87abd0e82035a51e1d4/Tarefa%205%20-%20gerencia%20de%20memoria.pdf)
 
 ### Entrega
 Você deve entregar o(s) código(s) fonte do simulador (.c e .h), e um relatório sobre o seu trabalho.
