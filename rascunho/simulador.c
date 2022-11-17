@@ -57,7 +57,6 @@ int main(int argc, char * argv[])
   page_size = atoi(argv[3]);
   mem_size = atoi(argv[4]);
   int cycle_num =0;
-  int num_of_trades = 0;
   n_pages = (page_size * 1000)/ mem_size;
   int pages_current_size = 0;
   pages = (Page *) malloc(sizeof(Page) * n_pages);
@@ -82,7 +81,7 @@ int main(int argc, char * argv[])
             {
               int index_to_overwrite = lru(pages,page_id,n_pages);
               setPageAt(pages,index_to_overwrite,page_id,cycle_num);
-              num_of_trades++;
+              n_page_faults++;
             }
             else
             {
@@ -92,13 +91,14 @@ int main(int argc, char * argv[])
         else 
         {
            setPageAt(pages,pages_current_size,page_id,cycle_num);
-            pages_current_size++;
+          n_page_faults++;
+          pages_current_size++;
         }
     }
     cycle_num++;
   }
 
-  printf("Numero trocas: %d \n",num_of_trades);
+  printf("Numero trocas: %d \n",n_page_faults);
   return 0;
 }
 
