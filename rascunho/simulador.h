@@ -23,11 +23,17 @@ int indice_pagina(int endereco,int paginaTamanho)
 int lru(Page * pages,int page_id,int pages_size)
 {
   int min_id = 0;
-  int min_t = pages->id;
+  int min_t = pages->t_last_access;
   
-  for(int i = 0; i < pages_size ; i++){
-    
+  for(int i = 1; i < pages_size ; i++){
+    if(min_t > pages[i].t_last_access){ //se for menor q o atual
+      min_t = pages[i].t_last_access; //atualiza o id do menor e o tempo do menor
+      min_id = i;
+    }
   }
+
+  //retorna qual deve ser sobrescrito
+  return min_id;
 }
 
 int nru(Page * pages,int page_id)
