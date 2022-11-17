@@ -58,54 +58,47 @@ int main(int argc, char * argv[])
   mem_size = atoi(argv[4]);
   int cycle_num =0;
   int num_of_trades = 0;
-  n_pages = (page_size * 1000)/mem_size;
-
+  n_pages = (page_size * 1000)/ mem_size;
+  int pages_current_size = 0;
   pages = (Page *) malloc(sizeof(Page) * n_pages);
   //page_ids = (int *) malloc(sizeof(Page) * n_pages)
+  printf("Numero de Paginas em memoria max: %d\n",n_pages);
   
   if (pages == NULL)
   {
     perror("erro no malloc");
     exit(5);
   }
-  int flag = 0;
+  
   while(fscanf(arq, "%x %c ", &addr, &rw) == 2)
   {
-      flag = 0;
-      for (int i = 0; i < n_pages; i++)
-      {
-        page_id = indice_pagina(addr, page_size);
-        
-        if (pages[i].id == page_id)
+      page_id = indice_pagina(addr, page_size);
+
+      if(!onPages(pages,page_id,pages_current_size))
+      {  
+        if(pages_current_size >= n_pages)
         {
-          pages[i].t_last_access = time;
-          time++;
-          flag = 1;
-          break;
+            if (alg_type == 0)
+            {
+              int index_to_overwrite = lru(pages,page_id,n_pages);
+              setPageAt(pages,index_to_overwrite,page_id,cycle_num);
+              num_of_trades++;
+            }
+            else
+            {
+              //nru(pages,page_id);
+            }
+        } 
+        else 
+        {
+           setPageAt(pages,pages_current_size,page_id,cycle_num);
+            pages_current_size++;
         }
-        
-      }
-    if(flag!=1){
-      if (alg_type == 0)
-          {
-            int index_to_overwrite = lru(pages,page_id,n_pages);
-            pages[index_to_overwrite].id = page_id;
-            pages[index_to_overwrite].M = 0;
-            pages[index_to_overwrite].R = 0;
-            pages[index_to_overwrite].t_last_access = cycle_num;
-            num_of_trades++;
-          }
-          else
-          {
-            nru(pages,page_id);
-          }
-          time++;
-          n_page_faults++;
     }
     cycle_num++;
   }
-  printf("Numero de trocas: %d\n",num_of_trades);
-  printf("Paginas escritas: %d\n",cycle_num - num_of_trades);
+
+  printf("Numero trocas: %d \n",num_of_trades);
   return 0;
 }
 
