@@ -14,8 +14,8 @@ typedef struct _page
 int indice_pagina(int endereco,int paginaTamanho)
 {
   int res;
-  paginaTamanho *= 1000;
-  res = (int) ceil(log2(paginaTamanho));
+  paginaTamanho *= 1024;
+  res = log2(paginaTamanho);
   return endereco >> res;
 }
 
