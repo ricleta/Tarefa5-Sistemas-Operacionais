@@ -14,14 +14,6 @@ typedef struct _page
   int id;
 } Page;
 
-int get_indice_pagina(int endereco,int paginaTamanho)
-{
-  int res;
-  paginaTamanho *= 1000;
-  res = log2(paginaTamanho);
-  return endereco >> res;
-}
-
 int * page_ids_arr(int tam) 
 {
 	int *arr = (int *) malloc(sizeof(int) * tam);
@@ -74,12 +66,12 @@ void set_page(Page * pages, int index, int id, int last_access, char RW)
   pages[index].R = R;
 }
 
-int lru(Page * pages,int page_id,int pages_size)
+int lru(Page * pages,int page_id,int n_pages)
 {
   int min_id = pages->id;
   int min_t = pages->t_last_access;
   
-  for(int i = 1; i < pages_size ; i++)
+  for(int i = 1; i < n_pages ; i++)
   {
     if(min_t > pages[i].t_last_access)
     { //se for menor q o atual
@@ -92,7 +84,7 @@ int lru(Page * pages,int page_id,int pages_size)
   return min_id;
 }
 
-int nru(Page * pages,int *page_ids, int pages_size)
+int nru(Page * pages,int *page_ids, int n_pages)
 {
   	int index_in_pages, flag, tam;
     int * no_ref_no_mod; // array de paginas nao referenciadas e nao modificadas
@@ -109,25 +101,24 @@ int nru(Page * pages,int *page_ids, int pages_size)
   	int t_antiga; 
     int pos_antiga = 0; 
   	
-  	no_ref_no_mod = page_ids_arr(pages_size); 
-  	mod_no_ref = page_ids_arr(pages_size); 
-  	ref_no_mod = page_ids_arr(pages_size); 
-  	ref_mod = page_ids_arr(pages_size);
-  
-  	for (int i = 0; i < pages_size; i++) 
+  	no_ref_no_mod = page_ids_arr(n_pages); 
+  	mod_no_ref = page_ids_arr(n_pages); 
+  	ref_no_mod = page_ids_arr(n_pages); 
+  	ref_mod = page_ids_arr(n_pages);
+
+  	for (int i = 0; i < n_pages; i++) 
     {
   		index_in_pages = page_ids[i];
+
   		if (pages[index_in_pages].R == 0) 
       {
   			if(pages[index_in_pages].M == 0) 
         {
-  				//não referenciada e não modificada
-  				no_ref_no_mod[id_arr0] = i; // Armazena índice vp
+  				no_ref_no_mod[id_arr0] = i;
   				id_arr0++;
   			}
   			else 
         {
-  				//não referenciada e modificada
   				mod_no_ref[id_arr1] = i;
   				id_arr1++;
   			}
@@ -136,13 +127,11 @@ int nru(Page * pages,int *page_ids, int pages_size)
       {
   			if(pages[index_in_pages].M == 0) 
         {
-  				//referenciada e não modificada
   				ref_no_mod[id_arr2] = i;
   				id_arr2++;
   			}
   			else 
         {
-  				//referenciada e modificada
   				ref_mod[id_arr3] = i;
   				id_arr3++;
   			}
@@ -150,19 +139,23 @@ int nru(Page * pages,int *page_ids, int pages_size)
   	}
   
   	int * vet;
-  	if ( no_ref_no_mod[0] != -1){
+  	if ( no_ref_no_mod[0] != -1)
+    {
   		vet = no_ref_no_mod;
   		tam = id_arr0;
   	} 
-  	else if (mod_no_ref[0] != -1) {
+  	else if (mod_no_ref[0] != -1) 
+    {
   		vet = mod_no_ref;
   		tam = id_arr1;
   	} 
-  	else if (ref_no_mod[0] != -1) {
+  	else if (ref_no_mod[0] != -1) 
+    {
   		vet = ref_no_mod;
   		tam = id_arr2;
   	} 
-  	else {
+  	else 
+    {
   		vet = ref_mod;
   		tam = id_arr3;
   	}

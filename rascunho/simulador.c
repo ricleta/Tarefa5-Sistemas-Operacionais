@@ -62,9 +62,10 @@ int main(int argc, char * argv[])
   arq = fopen(argv[2], "r");
   page_size = atoi(argv[3]);
   mem_size = atoi(argv[4]);
-  n_pages = (page_size * 1000)/ mem_size;
-  pages = (Page *) malloc(sizeof(Page) * n_pages);
-  //page_ids = (int *) malloc(sizeof(Page) * n_pages)
+  n_pages = (mem_size * 1000)/ page_size;
+  pages = (Page *) malloc(sizeof(Page) * pow(2, 32 - (int)(ceil(log2(page_size*1000)))));
+  
+  page_ids = (int *) malloc(sizeof(int) * n_pages);
   printf("Numero de max de paginas em memoria: %d\n",n_pages);
   
   if (pages == NULL)
@@ -72,11 +73,12 @@ int main(int argc, char * argv[])
     perror("erro no malloc");
     exit(5);
   }
+  // printf("Numero de max de paginas em memoria: %d\n",n_pages);
   
   while(fscanf(arq, "%x %c ", &addr, &rw) == 2)
   {
-      page_id = get_indice_pagina(addr, page_size);
-
+      page_id = addr >> (int)(ceil(log2(page_size * 1000)));
+    
       if(!is_in_Pages(pages,page_id,pages_current_size))
       {  
         if(pages_current_size >= n_pages)
@@ -85,9 +87,7 @@ int main(int argc, char * argv[])
           {
             index_to_overwrite = lru(pages,page_id,n_pages);
             set_page(pages,index_to_overwrite,page_id,time, rw);
-            // page_ids[pages_current_size] = index_to_overwrite;
-            // n_page_faults++;
-            // pages_current_size++;
+            page_ids[pages_current_size] = index_to_overwrite;
           }
           else if(alg_type == 1)
           {
