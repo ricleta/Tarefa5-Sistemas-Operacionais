@@ -176,6 +176,11 @@ int nru(Page * pages,int *page_ids, int n_pages)
   			t_antiga = pages[index_in_pages].t_last_access;
   		}
   	}
+
+    free(no_ref_no_mod); 
+    free(mod_no_ref); 
+    free(ref_no_mod); 
+    free(ref_mod);
   
-  return pos_antiga;
+    return pos_antiga;
 }

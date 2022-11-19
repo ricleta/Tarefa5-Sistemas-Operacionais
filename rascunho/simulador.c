@@ -5,7 +5,9 @@
 
 int main(int argc, char * argv[])
 {
-  int page_size, mem_size, n_pages, page_id, n_page_faults, page_ids_size;
+  int page_size, mem_size, n_pages, page_id, page_ids_size;
+  int n_written = 0;
+  int n_page_faults = 0;
   int index_to_overwrite;
   int alg_type = -1; // -1 -> invalido, 0 -> LRU, 1 -> NRU
   Page *pages;
@@ -30,7 +32,6 @@ int main(int argc, char * argv[])
   if (strcmp(argv[1], "NRU") == 0)
   {
     alg_type = 1;
-    page_ids = page_ids_arr(n_pages);
   }
   
   if (alg_type == -1)
@@ -58,23 +59,21 @@ int main(int argc, char * argv[])
     perror("tamanho de memoria fisica invalido, deve ser entre 1 e 16");
     exit(4);
   }
-
-  arq = fopen(argv[2], "r");
+  
   page_size = atoi(argv[3]);
   mem_size = atoi(argv[4]);
+  
   n_pages = (mem_size * 1000)/ page_size;
   pages = (Page *) malloc(sizeof(Page) * pow(2, 32 - (int)(ceil(log2(page_size*1000)))));
-  
   page_ids = (int *) malloc(sizeof(int) * n_pages);
-  printf("Numero de max de paginas em memoria: %d\n",n_pages);
   
   if (pages == NULL)
   {
     perror("erro no malloc");
     exit(5);
   }
-  // printf("Numero de max de paginas em memoria: %d\n",n_pages);
-  
+
+  printf("Executando simulador...\n");
   while(fscanf(arq, "%x %c ", &addr, &rw) == 2)
   {
       page_id = addr >> (int)(ceil(log2(page_size * 1000)));
@@ -95,20 +94,32 @@ int main(int argc, char * argv[])
             set_page(pages,index_to_overwrite,page_id,time, rw);
             page_ids[pages_current_size] = index_to_overwrite;
           }
-      } 
-      else 
-      {
-        set_page(pages,pages_current_size,page_id,time, rw);
-        page_ids[pages_current_size] = page_id;
-        pages_current_size++;
-      }
+
+          n_written++;
+      	} 
+      	else 
+      	{
+        	set_page(pages,pages_current_size,page_id,time, rw);
+        	page_ids[pages_current_size] = page_id;
+        	pages_current_size++;
+      	}
         
-      n_page_faults++;
-    }
+     	n_page_faults++;
+     }
+
     time++;
   }
 
-  printf("Page Faults: %d \n",n_page_faults);
+  printf("Arquivo de entrada: %s\n", argv[2]);
+  printf("Tamanho da memoria fisica: %s MB\n", argv[4]);
+  printf("Tamanho das paginas: %s KB\n", argv[3]);
+  printf("Algoritmo de substituicao: %s \n", argv[1]);
+  printf("Numero de page faults: %d \n",n_page_faults);
+  printf("Numero de paginas escritas: %d \n",n_written);
+
+  fclose(arq);
+  free(pages);
+  free(page_ids);
+  
   return 0;
 }
-
